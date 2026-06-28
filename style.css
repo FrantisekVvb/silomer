@@ -322,6 +322,144 @@ body.is-space-theme .force-readout {
   border-color: #e5e7eb;
 }
 
+.dog-panels {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 10px);
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 2;
+}
+
+.dog-panels[hidden] {
+  display: none !important;
+}
+
+.dog-quiz-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: min(220px, 42vw);
+  padding: 8px 10px;
+  border: 2px solid #1a1a1a;
+  border-radius: 8px;
+  background: #fff;
+  color: #1a1a1a;
+}
+
+.dog-quiz-panel-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.dog-quiz-panel-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.dog-quiz-panel-field {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  border: 2px solid #1a1a1a;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.dog-quiz-panel-field:focus-within {
+  outline: 2px solid #1a1a1a;
+  outline-offset: 1px;
+}
+
+.dog-quiz-panel-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 5px 4px 5px 6px;
+  border: 0;
+  background: transparent;
+  color: #1a1a1a;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.dog-quiz-panel-input:focus {
+  outline: none;
+}
+
+.dog-quiz-panel-unit {
+  flex: 0 0 auto;
+  padding: 5px 6px 5px 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  pointer-events: none;
+}
+
+.dog-quiz-panel-verify {
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  border: 2px solid #1a1a1a;
+  border-radius: 6px;
+  background: #1a1a1a;
+  color: #fff;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.dog-quiz-panel-verify:hover {
+  background: #333;
+}
+
+.dog-quiz-panel-feedback {
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.dog-quiz-panel-feedback.is-success {
+  color: #166534;
+}
+
+.dog-quiz-panel-feedback.is-error {
+  color: #b91c1c;
+}
+
+body.is-space-theme .dog-quiz-panel {
+  background: #fff;
+  color: #1a1a1a;
+  border-color: #e5e7eb;
+}
+
+body.is-space-theme .dog-quiz-panel-field {
+  background: #fff;
+  border-color: #1a1a1a;
+}
+
+body.is-space-theme .dog-quiz-panel-input {
+  background: transparent;
+  color: #1a1a1a;
+}
+
+body.is-space-theme .dog-quiz-panel-unit {
+  color: #1a1a1a;
+}
+
+body.is-space-theme .dog-quiz-panel-verify {
+  background: #1a1a1a;
+  color: #fff;
+  border-color: #1a1a1a;
+}
+
 body.is-space-theme .scene-header h1 {
   color: #f8fafc;
 }

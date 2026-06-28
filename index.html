@@ -31,6 +31,46 @@
           <div class="stage">
             <div id="silomer" class="silomer" aria-label="Siloměr"></div>
             <div id="force-readout" class="force-readout" aria-live="polite">0 N</div>
+            <div id="dog-panels" class="dog-panels" hidden>
+              <div class="dog-quiz-panel">
+                <p id="dog-weight-label" class="dog-quiz-panel-label">Tíha pejska na Zemi je</p>
+                <div class="dog-quiz-panel-row">
+                  <div class="dog-quiz-panel-field">
+                    <input
+                      id="dog-weight-input"
+                      class="dog-quiz-panel-input"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      spellcheck="false"
+                      aria-label="Tíha pejska v newtonech"
+                    />
+                    <span class="dog-quiz-panel-unit" aria-hidden="true">N</span>
+                  </div>
+                  <button type="button" id="dog-weight-verify" class="dog-quiz-panel-verify">Ověřit</button>
+                </div>
+                <p id="dog-weight-feedback" class="dog-quiz-panel-feedback" hidden aria-live="polite"></p>
+              </div>
+              <div class="dog-quiz-panel">
+                <p id="dog-mass-label" class="dog-quiz-panel-label">Hmotnost pejska na Zemi je</p>
+                <div class="dog-quiz-panel-row">
+                  <div class="dog-quiz-panel-field">
+                    <input
+                      id="dog-mass-input"
+                      class="dog-quiz-panel-input"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      spellcheck="false"
+                      aria-label="Hmotnost pejska v kilogramech"
+                    />
+                    <span class="dog-quiz-panel-unit" aria-hidden="true">kg</span>
+                  </div>
+                  <button type="button" id="dog-mass-verify" class="dog-quiz-panel-verify">Ověřit</button>
+                </div>
+                <p id="dog-mass-feedback" class="dog-quiz-panel-feedback" hidden aria-live="polite"></p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -7,6 +7,15 @@ const forceReadoutEl = document.getElementById('force-readout');
 const weightsLayerEl = document.getElementById('weights-layer');
 const gravitySwitchEl = document.getElementById('gravity-switch');
 const resetBtnEl = document.getElementById('silomer-reset');
+const dogPanelsEl = document.getElementById('dog-panels');
+const dogWeightLabelEl = document.getElementById('dog-weight-label');
+const dogWeightInputEl = document.getElementById('dog-weight-input');
+const dogWeightVerifyEl = document.getElementById('dog-weight-verify');
+const dogWeightFeedbackEl = document.getElementById('dog-weight-feedback');
+const dogMassLabelEl = document.getElementById('dog-mass-label');
+const dogMassInputEl = document.getElementById('dog-mass-input');
+const dogMassVerifyEl = document.getElementById('dog-mass-verify');
+const dogMassFeedbackEl = document.getElementById('dog-mass-feedback');
 
 const REFERENCE_MASS_KG = 2;
 const EARTH_N_PER_KG = 10;
@@ -20,21 +29,30 @@ const VIEW_BOX_HEIGHT = 1175;
 const MAX_STAGE_WIDTH = 168;
 const VIEWPORT_PADDING = 28;
 const WORKSPACE_GAP = 14;
-const CONTENT_OFFSET_X = 130;
+const CONTENT_OFFSET_X = 80;
 const DOCK_COL_GAP = 12;
 const DOCK_ROW_GAP = 16;
 const DOCK_TOP_NEWTONS = 3.5;
+const DOCK_OFFSET_Y = -40;
 
 const DOCK_LAYOUT = [
   [
-    { massKg: 0.1, column: 0 },
-    { massKg: 0.5, column: 1 },
+    { id: 'disk-0.1', column: 0 },
+    { id: 'disk-0.5', column: 1 },
   ],
   [
-    { massKg: 1, column: 0 },
-    { massKg: 1.6, column: 1 },
+    { id: 'disk-1', column: 0 },
+    { id: 'disk-1.6', column: 1 },
   ],
-  [{ massKg: 2, column: 'center' }],
+  [{ id: 'disk-2', column: 'center' }],
+  [
+    { id: 'car-0.8', column: 0 },
+    { id: 'bottle-1', column: 1 },
+  ],
+  [
+    { id: 'handbag-1.25', column: 0 },
+    { id: 'dog-1.5', column: 1 },
+  ],
 ];
 
 const SPRING_ORIGIN_Y = 81.6455;
@@ -52,13 +70,119 @@ const READOUT_ANCHOR_VB_Y = 590.198;
 const SNAP_RADIUS_PX = 80;
 const SNAP_ATTACH_OFFSET_Y = 10;
 
+const QUIZ_WEIGHT_VARIANTS = new Set(['dog', 'bottle', 'car', 'handbag']);
+
+const QUIZ_MASS_PANEL_LABELS = {
+  dog: {
+    earth: 'Hmotnost pejska na Zemi je',
+    moon: 'Hmotnost pejska na Měsíci je',
+    space: 'Hmotnost pejska v kosmickém prostoru je',
+  },
+  bottle: {
+    earth: 'Hmotnost lahve na Zemi je',
+    moon: 'Hmotnost lahve na Měsíci je',
+    space: 'Hmotnost lahve v kosmickém prostoru je',
+  },
+  car: {
+    earth: 'Hmotnost autíčka na Zemi je',
+    moon: 'Hmotnost autíčka na Měsíci je',
+    space: 'Hmotnost autíčka v kosmickém prostoru je',
+  },
+  handbag: {
+    earth: 'Hmotnost kabelky na Zemi je',
+    moon: 'Hmotnost kabelky na Měsíci je',
+    space: 'Hmotnost kabelky v kosmickém prostoru je',
+  },
+};
+
+const QUIZ_WEIGHT_PANEL_LABELS = {
+  dog: {
+    earth: 'Tíha pejska na Zemi je',
+    moon: 'Tíha pejska na Měsíci je',
+    space: 'Tíha pejska v kosmickém prostoru je',
+  },
+  bottle: {
+    earth: 'Tíha lahve na Zemi je',
+    moon: 'Tíha lahve na Měsíci je',
+    space: 'Tíha lahve v kosmickém prostoru je',
+  },
+  car: {
+    earth: 'Tíha autíčka na Zemi je',
+    moon: 'Tíha autíčka na Měsíci je',
+    space: 'Tíha autíčka v kosmickém prostoru je',
+  },
+  handbag: {
+    earth: 'Tíha kabelky na Zemi je',
+    moon: 'Tíha kabelky na Měsíci je',
+    space: 'Tíha kabelky v kosmickém prostoru je',
+  },
+};
+
+const QUIZ_MASS_INPUT_LABELS = {
+  dog: 'Hmotnost pejska v kilogramech',
+  bottle: 'Hmotnost lahve v kilogramech',
+  car: 'Hmotnost autíčka v kilogramech',
+  handbag: 'Hmotnost kabelky v kilogramech',
+};
+
+const QUIZ_FORCE_INPUT_LABELS = {
+  dog: 'Tíha pejska v newtonech',
+  bottle: 'Tíha lahve v newtonech',
+  car: 'Tíha autíčka v newtonech',
+  handbag: 'Tíha kabelky v newtonech',
+};
+
 const WEIGHT_SPECS = [
-  { massKg: 0.1 },
-  { massKg: 0.5 },
-  { massKg: 1 },
-  { massKg: 1.6 },
-  { massKg: 2 },
+  { id: 'disk-0.1', massKg: 0.1 },
+  { id: 'disk-0.5', massKg: 0.5 },
+  { id: 'car-0.8', massKg: 0.8, variant: 'car' },
+  { id: 'bottle-1', massKg: 1, variant: 'bottle' },
+  { id: 'disk-1', massKg: 1 },
+  { id: 'handbag-1.25', massKg: 1.25, variant: 'handbag' },
+  { id: 'dog-1.5', massKg: 1.5, variant: 'dog' },
+  { id: 'disk-1.6', massKg: 1.6 },
+  { id: 'disk-2', massKg: 2 },
 ];
+
+const DISK_WEIGHT_GRAPHIC = {
+  viewBox: WEIGHT_VIEW_BOX,
+  width: WEIGHT_VIEW_BOX_WIDTH,
+  height: WEIGHT_VIEW_BOX_HEIGHT,
+  hookX: WEIGHT_HOOK_VB_X,
+  hookY: WEIGHT_HOOK_VB_Y,
+};
+
+const DOG_WEIGHT_GRAPHIC = {
+  viewBox: '0 0 91 96',
+  width: 91,
+  height: 96,
+  hookX: 46,
+  hookY: 2,
+};
+
+const BOTTLE_WEIGHT_GRAPHIC = {
+  viewBox: '0 0 87 147',
+  width: 87,
+  height: 147,
+  hookX: 44,
+  hookY: 0,
+};
+
+const CAR_WEIGHT_GRAPHIC = {
+  viewBox: '0 0 163 58',
+  width: 163,
+  height: 58,
+  hookX: 82,
+  hookY: 0,
+};
+
+const HANDBAG_WEIGHT_GRAPHIC = {
+  viewBox: '0 0 154 131',
+  width: 154,
+  height: 131,
+  hookX: 77,
+  hookY: 1,
+};
 
 const GRAVITY_ENVIRONMENTS = {
   earth: { label: 'Země', nPerKg: 10 },
@@ -85,6 +209,10 @@ let stageWidthPx = 0;
 let weights = [];
 let draggingWeight = null;
 let weightDiskSvgText = '';
+let weightDogSvgText = '';
+let weightBottleSvgText = '';
+let weightCarSvgText = '';
+let weightHandbagSvgText = '';
 
 let isCordCut = false;
 let isFallComplete = false;
@@ -469,6 +597,160 @@ function layoutForceReadout() {
       : 'translateY(-50%)';
 }
 
+function layoutDogPanels() {
+  if (!dogPanelsEl || !stageEl) return;
+
+  const stageHeight = stageEl.offsetHeight;
+  const hookY = (getRenderedHookVbY() / VIEW_BOX_HEIGHT) * stageHeight;
+  dogPanelsEl.style.top = `${hookY}px`;
+  dogPanelsEl.style.transform =
+    isCordCut && fallOffsetY > 0
+      ? `translateY(calc(${fallOffsetY}px - 50%))`
+      : 'translateY(-50%)';
+}
+
+function parseNumericInput(text, unitPattern) {
+  const cleaned = text.trim().replace(unitPattern, '').replace(',', '.');
+  if (!cleaned) return null;
+  const value = Number.parseFloat(cleaned);
+  return Number.isFinite(value) ? value : null;
+}
+
+function parseMassInput(text) {
+  return parseNumericInput(text, /\s*kg\s*/gi);
+}
+
+function parseForceInput(text) {
+  return parseNumericInput(text, /\s*N\s*/gi);
+}
+
+function clearDogMassFeedback() {
+  if (!dogMassFeedbackEl) return;
+  dogMassFeedbackEl.hidden = true;
+  dogMassFeedbackEl.textContent = '';
+  dogMassFeedbackEl.classList.remove('is-success', 'is-error');
+}
+
+function clearDogWeightFeedback() {
+  if (!dogWeightFeedbackEl) return;
+  dogWeightFeedbackEl.hidden = true;
+  dogWeightFeedbackEl.textContent = '';
+  dogWeightFeedbackEl.classList.remove('is-success', 'is-error');
+}
+
+function clearDogQuizInputs() {
+  clearDogMassFeedback();
+  clearDogWeightFeedback();
+  if (dogMassInputEl) dogMassInputEl.value = '';
+  if (dogWeightInputEl) dogWeightInputEl.value = '';
+}
+
+function showDogMassFeedback(message, kind) {
+  if (!dogMassFeedbackEl) return;
+  dogMassFeedbackEl.textContent = message;
+  dogMassFeedbackEl.hidden = false;
+  dogMassFeedbackEl.classList.toggle('is-success', kind === 'success');
+  dogMassFeedbackEl.classList.toggle('is-error', kind === 'error');
+}
+
+function showDogWeightFeedback(message, kind) {
+  if (!dogWeightFeedbackEl) return;
+  dogWeightFeedbackEl.textContent = message;
+  dogWeightFeedbackEl.hidden = false;
+  dogWeightFeedbackEl.classList.toggle('is-success', kind === 'success');
+  dogWeightFeedbackEl.classList.toggle('is-error', kind === 'error');
+}
+
+function verifyDogWeightInput() {
+  const quizWeight = getMountedQuizWeight();
+  if (!quizWeight) return;
+
+  const value = parseForceInput(dogWeightInputEl?.value ?? '');
+  if (value === null) {
+    showDogWeightFeedback('Zadej číslo v newtonech.', 'error');
+    return;
+  }
+
+  const targetWeightN = quizWeight.massKg * getGravityNPerKg();
+  if (Math.abs(value - targetWeightN) < 0.1) {
+    showDogWeightFeedback('Správně!', 'success');
+    return;
+  }
+
+  showDogWeightFeedback('To není správně. Zkus to znovu.', 'error');
+}
+
+function verifyDogMassInput() {
+  const quizWeight = getMountedQuizWeight();
+  if (!quizWeight) return;
+
+  const value = parseMassInput(dogMassInputEl?.value ?? '');
+  if (value === null) {
+    showDogMassFeedback('Zadej číslo v kilogramech.', 'error');
+    return;
+  }
+
+  if (Math.abs(value - quizWeight.massKg) < 0.05) {
+    showDogMassFeedback('Správně!', 'success');
+    return;
+  }
+
+  showDogMassFeedback('To není správně. Zkus to znovu.', 'error');
+}
+
+function getMountedQuizWeight() {
+  const mounted = getMountedWeight();
+  if (!mounted || !QUIZ_WEIGHT_VARIANTS.has(mounted.variant)) return null;
+  return mounted;
+}
+
+function getQuizWeightPanelLabel(variant) {
+  return (
+    QUIZ_WEIGHT_PANEL_LABELS[variant]?.[gravityEnvironment] ??
+    QUIZ_WEIGHT_PANEL_LABELS.dog.earth
+  );
+}
+
+function getQuizMassPanelLabel(variant) {
+  return (
+    QUIZ_MASS_PANEL_LABELS[variant]?.[gravityEnvironment] ??
+    QUIZ_MASS_PANEL_LABELS.dog.earth
+  );
+}
+
+function updateDogPanels() {
+  if (!dogPanelsEl) return;
+
+  const quizWeight = getMountedQuizWeight();
+  const show = Boolean(quizWeight);
+  dogPanelsEl.hidden = !show;
+
+  if (quizWeight) {
+    if (dogWeightLabelEl) {
+      dogWeightLabelEl.textContent = getQuizWeightPanelLabel(quizWeight.variant);
+    }
+    if (dogMassLabelEl) {
+      dogMassLabelEl.textContent = getQuizMassPanelLabel(quizWeight.variant);
+    }
+    if (dogWeightInputEl) {
+      dogWeightInputEl.setAttribute(
+        'aria-label',
+        QUIZ_FORCE_INPUT_LABELS[quizWeight.variant] ?? QUIZ_FORCE_INPUT_LABELS.dog,
+      );
+    }
+    if (dogMassInputEl) {
+      dogMassInputEl.setAttribute(
+        'aria-label',
+        QUIZ_MASS_INPUT_LABELS[quizWeight.variant] ?? QUIZ_MASS_INPUT_LABELS.dog,
+      );
+    }
+  }
+
+  if (!show) {
+    clearDogQuizInputs();
+  }
+}
+
 function getHookScreenPoint() {
   const point = vbToScreen(HOOK_VB_X, getRenderedHookVbY());
   if (isCordCut) {
@@ -483,26 +765,102 @@ function distance(ax, ay, bx, by) {
   return Math.hypot(dx, dy);
 }
 
-function getWeightDimensions(massKg) {
+function getWeightSpec(massKg) {
+  return WEIGHT_SPECS.find((spec) => spec.massKg === massKg);
+}
+
+function getWeightSpecById(id) {
+  return WEIGHT_SPECS.find((spec) => spec.id === id) ?? null;
+}
+
+function getWeightGraphicForSpec(spec) {
+  if (spec?.variant === 'dog') return DOG_WEIGHT_GRAPHIC;
+  if (spec?.variant === 'bottle') return BOTTLE_WEIGHT_GRAPHIC;
+  if (spec?.variant === 'car') return CAR_WEIGHT_GRAPHIC;
+  if (spec?.variant === 'handbag') return HANDBAG_WEIGHT_GRAPHIC;
+  return DISK_WEIGHT_GRAPHIC;
+}
+
+function getWeightSvgText(variant) {
+  if (variant === 'dog') return weightDogSvgText;
+  if (variant === 'bottle') return weightBottleSvgText;
+  if (variant === 'car') return weightCarSvgText;
+  if (variant === 'handbag') return weightHandbagSvgText;
+  return weightDiskSvgText;
+}
+
+function getWeightElementClass(variant) {
+  if (variant === 'dog') return 'weight-piece weight-piece--dog';
+  if (variant === 'bottle') return 'weight-piece weight-piece--bottle';
+  if (variant === 'car') return 'weight-piece weight-piece--car';
+  if (variant === 'handbag') return 'weight-piece weight-piece--handbag';
+  return 'weight-piece';
+}
+
+function getWeightAriaLabel(spec) {
+  const massLabel = formatMassLabel(spec.massKg);
+  if (spec.variant === 'dog') {
+    return `Závaží pes ${massLabel}, přetáhni na háček siloměru nebo sundej tažením pryč`;
+  }
+  if (spec.variant === 'bottle') {
+    return `Závaží láhev ${massLabel}, přetáhni na háček siloměru nebo sundej tažením pryč`;
+  }
+  if (spec.variant === 'car') {
+    return `Závaží autíčko ${massLabel}, přetáhni na háček siloměru nebo sundej tažením pryč`;
+  }
+  if (spec.variant === 'handbag') {
+    return `Závaží kabelka ${massLabel}, přetáhni na háček siloměru nebo sundej tažením pryč`;
+  }
+  return `Závaží ${massLabel}, přetáhni na háček siloměru nebo sundej tažením pryč`;
+}
+
+function getDockColumnIds(column) {
+  return DOCK_LAYOUT.flatMap((row) =>
+    row.filter((slot) => slot.column === column).map((slot) => slot.id),
+  );
+}
+
+function estimateWeightWidth(spec, stageWidth) {
+  const graphic = getWeightGraphicForSpec(spec);
+  const scale = massToScale(spec.massKg);
+  return stageWidth * scale * (graphic.width / WEIGHT_VIEW_BOX_WIDTH);
+}
+
+function getWeightDimensions(massKgOrWeightOrSpec) {
+  const weight =
+    massKgOrWeightOrSpec?.el !== undefined && massKgOrWeightOrSpec?.graphic
+      ? massKgOrWeightOrSpec
+      : null;
+  const spec =
+    !weight && massKgOrWeightOrSpec?.id && massKgOrWeightOrSpec?.massKg !== undefined
+      ? massKgOrWeightOrSpec
+      : null;
+  const massKg = weight?.massKg ?? spec?.massKg ?? massKgOrWeightOrSpec;
+  const graphic =
+    weight?.graphic ??
+    getWeightGraphicForSpec(spec ?? getWeightSpec(typeof massKg === 'number' ? massKg : spec?.massKg));
   const scale = massToScale(massKg);
-  const widthPx = stageWidthPx * scale;
-  const heightPx = widthPx * (WEIGHT_VIEW_BOX_HEIGHT / WEIGHT_VIEW_BOX_WIDTH);
-  return { widthPx, heightPx, scale };
+  const widthPx = stageWidthPx * scale * (graphic.width / WEIGHT_VIEW_BOX_WIDTH);
+  const heightPx = widthPx * (graphic.height / graphic.width);
+  return { widthPx, heightPx, scale, graphic };
 }
 
 function applyWeightSize(weight) {
-  const { widthPx, heightPx, scale } = getWeightDimensions(weight.massKg);
+  const { widthPx, heightPx, scale } = getWeightDimensions(weight);
   weight.widthPx = widthPx;
   weight.heightPx = heightPx;
   weight.el.style.width = `${widthPx}px`;
   weight.el.style.height = `${heightPx}px`;
-  weight.labelEl.style.fontSize = `${Math.max(0.42, 0.88 * scale)}rem`;
+  if (weight.labelEl) {
+    weight.labelEl.style.fontSize = `${Math.max(0.42, 0.88 * scale)}rem`;
+  }
 }
 
 function getWeightHookOffset(weight) {
+  const { graphic, widthPx, heightPx } = getWeightDimensions(weight);
   return {
-    x: (WEIGHT_HOOK_VB_X / WEIGHT_VIEW_BOX_WIDTH) * weight.widthPx,
-    y: (WEIGHT_HOOK_VB_Y / WEIGHT_VIEW_BOX_HEIGHT) * weight.heightPx,
+    x: (graphic.hookX / graphic.width) * widthPx,
+    y: (graphic.hookY / graphic.height) * heightPx,
   };
 }
 
@@ -579,8 +937,8 @@ function scaleNewtonsToScreenY(newtons) {
   return stageRect.top + (vbY / VIEW_BOX_HEIGHT) * stageRect.height;
 }
 
-function getWeightByMass(massKg) {
-  return weights.find((weight) => weight.massKg === massKg) ?? null;
+function getWeightById(id) {
+  return weights.find((weight) => weight.id === id) ?? null;
 }
 
 function getDockSlotX(slot, weight, metrics) {
@@ -594,17 +952,17 @@ function getDockSlotX(slot, weight, metrics) {
 function layoutAllDockedWeights() {
   const metrics = getDockGridMetrics();
   const firstRowHeight = Math.max(
-    ...DOCK_LAYOUT[0].map((slot) => getWeightDimensions(slot.massKg).heightPx),
+    ...DOCK_LAYOUT[0].map((slot) => getWeightDimensions(getWeightSpecById(slot.id)).heightPx),
   );
-  let rowTop = scaleNewtonsToScreenY(DOCK_TOP_NEWTONS) - firstRowHeight / 2;
+  let rowTop = scaleNewtonsToScreenY(DOCK_TOP_NEWTONS) - firstRowHeight / 2 + DOCK_OFFSET_Y;
 
   DOCK_LAYOUT.forEach((row) => {
     const rowHeight = Math.max(
-      ...row.map((slot) => getWeightDimensions(slot.massKg).heightPx),
+      ...row.map((slot) => getWeightDimensions(getWeightSpecById(slot.id)).heightPx),
     );
 
     row.forEach((slot) => {
-      const weight = getWeightByMass(slot.massKg);
+      const weight = getWeightById(slot.id);
       if (!weight || weight.state !== 'docked') return;
 
       weight.pos = {
@@ -622,12 +980,10 @@ function getDockGridMetrics() {
   const anchorRect = stageAnchorEl.getBoundingClientRect();
   const dockX = anchorRect.left + stageWidthPx + WORKSPACE_GAP;
   const leftColWidth = Math.max(
-    getWeightDimensions(0.1).widthPx,
-    getWeightDimensions(1).widthPx,
+    ...getDockColumnIds(0).map((id) => getWeightDimensions(getWeightSpecById(id)).widthPx),
   );
   const rightColWidth = Math.max(
-    getWeightDimensions(0.5).widthPx,
-    getWeightDimensions(1.6).widthPx,
+    ...getDockColumnIds(1).map((id) => getWeightDimensions(getWeightSpecById(id)).widthPx),
   );
   const gridWidth = leftColWidth + DOCK_COL_GAP + rightColWidth;
 
@@ -636,12 +992,10 @@ function getDockGridMetrics() {
 
 function getDockAreaWidth(stageWidth = stageWidthPx) {
   const leftColWidth = Math.max(
-    stageWidth * massToScale(0.1),
-    stageWidth * massToScale(1),
+    ...getDockColumnIds(0).map((id) => estimateWeightWidth(getWeightSpecById(id), stageWidth)),
   );
   const rightColWidth = Math.max(
-    stageWidth * massToScale(0.5),
-    stageWidth * massToScale(1.6),
+    ...getDockColumnIds(1).map((id) => estimateWeightWidth(getWeightSpecById(id), stageWidth)),
   );
   return leftColWidth + DOCK_COL_GAP + rightColWidth;
 }
@@ -709,6 +1063,7 @@ function updateLayers() {
   });
 
   layoutForceReadout();
+  layoutDogPanels();
 }
 
 function isWeightVisible(weight) {
@@ -732,6 +1087,7 @@ function updateUi() {
   });
 
   playSurfaceEl.classList.toggle('is-mounted', Boolean(mountedWeight));
+  updateDogPanels();
   updateGravityUi();
 }
 
@@ -759,6 +1115,7 @@ function setGravityEnvironment(nextEnv) {
   if (!GRAVITY_ENVIRONMENTS[nextEnv] || gravityEnvironment === nextEnv) return;
 
   gravityEnvironment = nextEnv;
+  clearDogQuizInputs();
   updateGravityUi();
 
   const mounted = getMountedWeight();
@@ -821,8 +1178,13 @@ function animateTo(nextTarget) {
 }
 
 function createWeightElement(spec) {
+  const variant = spec.variant ?? 'disk';
+  const graphic = getWeightGraphicForSpec(spec);
   const weight = {
+    id: spec.id,
     massKg: spec.massKg,
+    variant,
+    graphic,
     el: null,
     labelEl: null,
     state: 'docked',
@@ -836,37 +1198,38 @@ function createWeightElement(spec) {
   };
 
   const el = document.createElement('div');
-  el.className = 'weight-piece';
+  el.className = getWeightElementClass(variant);
   el.tabIndex = 0;
   el.role = 'button';
   el.dataset.massKg = String(spec.massKg);
-  el.setAttribute(
-    'aria-label',
-    `Závaží ${formatMassLabel(spec.massKg)}, přetáhni na háček siloměru nebo sundej tažením pryč`,
-  );
+  el.dataset.weightId = spec.id;
+  el.setAttribute('aria-label', getWeightAriaLabel(spec));
 
-  const graphic = document.createElement('div');
-  graphic.className = 'weight-piece-graphic';
-  graphic.innerHTML = weightDiskSvgText.trim();
+  const graphicEl = document.createElement('div');
+  graphicEl.className = 'weight-piece-graphic';
+  graphicEl.innerHTML = getWeightSvgText(variant).trim();
 
-  const svg = graphic.querySelector('svg');
+  const svg = graphicEl.querySelector('svg');
   if (svg) {
     svg.removeAttribute('width');
     svg.removeAttribute('height');
-    svg.setAttribute('viewBox', WEIGHT_VIEW_BOX);
+    svg.setAttribute('viewBox', graphic.viewBox);
     svg.setAttribute('aria-hidden', 'true');
   }
 
-  const labelEl = document.createElement('span');
-  labelEl.className = 'weight-label';
-  labelEl.textContent = formatMassLabel(spec.massKg);
+  if (variant === 'disk') {
+    const labelEl = document.createElement('span');
+    labelEl.className = 'weight-label';
+    labelEl.textContent = formatMassLabel(spec.massKg);
+    el.append(labelEl);
+    weight.labelEl = labelEl;
+  }
 
-  el.append(graphic, labelEl);
+  el.prepend(graphicEl);
   el.addEventListener('pointerdown', (event) => onPointerDown(event, weight));
   weightsLayerEl.appendChild(el);
 
   weight.el = el;
-  weight.labelEl = labelEl;
   return weight;
 }
 
@@ -1082,6 +1445,10 @@ function mountAnimatedSvg(svgText) {
     layerGroups[layer].appendChild(path);
     if (layer === 'spring') {
       path.setAttribute('vector-effect', 'non-scaling-stroke');
+      const strokeWidth = Number.parseFloat(path.getAttribute('stroke-width'));
+      if (Number.isFinite(strokeWidth)) {
+        path.setAttribute('stroke-width', String(strokeWidth * 0.5));
+      }
     }
   });
 
@@ -1102,12 +1469,20 @@ function mountAnimatedSvg(svgText) {
 }
 
 async function init() {
-  const [loadedText, diskText] = await Promise.all([
+  const [loadedText, diskText, dogText, bottleText, carText, handbagText] = await Promise.all([
     fetch('assets/silomer-loaded.svg').then((r) => r.text()),
     fetch('assets/weight-disk.svg').then((r) => r.text()),
+    fetch('assets/weight-dog.svg').then((r) => r.text()),
+    fetch('assets/weight-bottle.svg').then((r) => r.text()),
+    fetch('assets/weight-car.svg').then((r) => r.text()),
+    fetch('assets/weight-handbag.svg').then((r) => r.text()),
   ]);
 
   weightDiskSvgText = diskText;
+  weightDogSvgText = dogText;
+  weightBottleSvgText = bottleText;
+  weightCarSvgText = carText;
+  weightHandbagSvgText = handbagText;
 
   const layer = mountAnimatedSvg(loadedText);
   silomerEl.appendChild(layer);
@@ -1140,6 +1515,34 @@ if (gravitySwitchEl) {
 
 if (resetBtnEl) {
   resetBtnEl.addEventListener('click', resetSilomer);
+}
+
+if (dogWeightVerifyEl) {
+  dogWeightVerifyEl.addEventListener('click', verifyDogWeightInput);
+}
+
+if (dogWeightInputEl) {
+  dogWeightInputEl.addEventListener('input', clearDogWeightFeedback);
+  dogWeightInputEl.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      verifyDogWeightInput();
+    }
+  });
+}
+
+if (dogMassVerifyEl) {
+  dogMassVerifyEl.addEventListener('click', verifyDogMassInput);
+}
+
+if (dogMassInputEl) {
+  dogMassInputEl.addEventListener('input', clearDogMassFeedback);
+  dogMassInputEl.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      verifyDogMassInput();
+    }
+  });
 }
 
 init().catch((err) => {
