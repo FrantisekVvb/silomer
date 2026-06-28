@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Siloměr</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="space-backdrop" class="space-backdrop" aria-hidden="true"></div>
+  <div id="earth-grass" class="earth-grass" aria-hidden="true">
+    <img src="assets/travnik.svg" alt="" width="667" height="159" decoding="async" />
+  </div>
+  <div id="moon-surface" class="moon-surface" aria-hidden="true">
+    <img src="assets/mesic-povrch.svg" alt="" width="667" height="159" decoding="async" />
+  </div>
+  <main class="scene" aria-label="Simulace siloměru se závažími">
+    <header class="scene-header">
+      <h1>Siloměr</h1>
+      <div id="gravity-switch" class="gravity-switch" role="group" aria-label="Gravitační prostředí">
+        <button type="button" class="gravity-switch-btn is-active" data-env="earth" aria-pressed="true">Země</button>
+        <button type="button" class="gravity-switch-btn" data-env="moon" aria-pressed="false">Měsíc</button>
+        <button type="button" class="gravity-switch-btn" data-env="space" aria-pressed="false">Kosmický prostor</button>
+      </div>
+      <button type="button" id="silomer-reset" class="silomer-reset" hidden>Reset</button>
+    </header>
+
+    <div class="scene-body">
+      <div class="play-surface" id="play-surface">
+        <div class="stage-anchor" id="stage-anchor">
+          <div class="stage">
+            <div id="silomer" class="silomer" aria-label="Siloměr"></div>
+            <div id="force-readout" class="force-readout" aria-live="polite">0 N</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="weights-layer" class="weights-layer" aria-label="Závaží siloměru"></div>
+
+  <script src="main.js"></script>
+</body>
+</html>

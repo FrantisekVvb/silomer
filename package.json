@@ -1,0 +1,13 @@
+{
+  "name": "silomer-2",
+  "version": "1.0.0",
+  "description": "Siloměr — interaktivní simulace zavěšení závaží 2 kg",
+  "license": "MIT",
+  "scripts": {
+    "start": "npx --yes serve . -l 3475",
+    "dev": "npm start"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
