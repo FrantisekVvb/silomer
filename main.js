@@ -1111,11 +1111,27 @@ function updateSpaceTheme() {
   document.body.classList.toggle('is-moon-theme', isMoon);
 }
 
+function restoreSilomerOnCord() {
+  if (!isCordCut) return false;
+
+  stopFallAnimation();
+  if (resetRafId) {
+    cancelAnimationFrame(resetRafId);
+    resetRafId = null;
+  }
+  isResetting = false;
+  finishSilomerReset();
+  return true;
+}
+
 function setGravityEnvironment(nextEnv) {
   if (!GRAVITY_ENVIRONMENTS[nextEnv] || gravityEnvironment === nextEnv) return;
 
   gravityEnvironment = nextEnv;
   clearDogQuizInputs();
+
+  if (restoreSilomerOnCord()) return;
+
   updateGravityUi();
 
   const mounted = getMountedWeight();
