@@ -252,6 +252,10 @@ function pxToStageVbY(px) {
   return (px / stageHeight) * VIEW_BOX_HEIGHT;
 }
 
+function updateFallLayer() {
+  document.body.classList.toggle('is-silomer-falling', isCordCut && fallOffsetY > 0);
+}
+
 function applyFallTransform() {
   if (!fallingBodyGroup) return;
 
@@ -260,6 +264,7 @@ function applyFallTransform() {
     'transform',
     fallVbY > 0 ? `translate(0 ${fallVbY})` : '',
   );
+  updateFallLayer();
   updateLayers();
 }
 

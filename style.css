@@ -68,13 +68,27 @@ body.is-space-theme .earth-grass {
 
 .moon-surface img {
   display: block;
-  width: 20%;
+  width: min(52vw, 480px);
   margin: 0 auto;
   height: auto;
 }
 
 body.is-moon-theme .moon-surface {
   opacity: 1;
+}
+
+body.is-moon-theme.is-silomer-falling .moon-surface {
+  z-index: 1;
+}
+
+body.is-moon-theme.is-silomer-falling .scene {
+  z-index: 100;
+}
+
+body.is-moon-theme.is-silomer-falling .play-surface,
+body.is-moon-theme.is-silomer-falling .stage,
+body.is-moon-theme.is-silomer-falling .silomer svg {
+  overflow: visible;
 }
 
 body.is-space-theme {
