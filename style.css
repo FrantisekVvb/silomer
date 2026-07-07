@@ -45,7 +45,7 @@ body.is-space-theme .space-backdrop {
 
 .earth-grass img {
   display: block;
-  width: 20%;
+  width: min(52vw, 480px);
   margin: 0 auto;
   height: auto;
 }
@@ -77,17 +77,21 @@ body.is-moon-theme .moon-surface {
   opacity: 1;
 }
 
+body.is-silomer-falling:not(.is-moon-theme) .earth-grass {
+  z-index: 1;
+}
+
 body.is-moon-theme.is-silomer-falling .moon-surface {
   z-index: 1;
 }
 
-body.is-moon-theme.is-silomer-falling .scene {
+body.is-silomer-falling .scene {
   z-index: 100;
 }
 
-body.is-moon-theme.is-silomer-falling .play-surface,
-body.is-moon-theme.is-silomer-falling .stage,
-body.is-moon-theme.is-silomer-falling .silomer svg {
+body.is-silomer-falling .play-surface,
+body.is-silomer-falling .stage,
+body.is-silomer-falling .silomer svg {
   overflow: visible;
 }
 
